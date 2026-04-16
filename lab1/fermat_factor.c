@@ -15,17 +15,23 @@ FactorizationValues sqrt_reduction(long long n);
 int main(void) {
     srand(time(0));
 
-    long long n, fermat_n, even_factor = 1, even_counter = 0;
-    scanf("%lld", &n);
-    fermat_n = n;
+    long long n, even_factor = 1, even_counter = 0;
+    double time_used_fermat, time_used_sqr;
+    clock_t start, end;
 
-    while(fermat_n % 2 == 0) {
-        fermat_n /= 2;
+    scanf("%lld", &n);
+
+    start = clock();
+    while(n % 2 == 0) {
+        n /= 2;
         even_counter++;
     }
 
-    FactorizationValues fermat_results = fermat_factorization(fermat_n);
+    FactorizationValues fermat_results = fermat_factorization(n);
+    end = clock();
+    time_used_fermat = (double)(end - start) / CLOCKS_PER_SEC;
 
+    printf("Tiempo usado por factorización de fermat: %f segundos\n", time_used_fermat);
     printf("p: %lld\n", fermat_results.p);
     printf("q: %lld\n", fermat_results.q);
 
@@ -37,16 +43,29 @@ int main(void) {
         printf("n = p * q = %lld\n", fermat_results.p * fermat_results.q);
     }
 
+
     printf("=========================================================================\n");
 
     if (n < 4){
+        printf("El algoritmo de reducción a cuadrado fallo.\n");
         printf("El número debe de ser mayor o igual que 4 para usar la factorización de reducción a cuadrado");
     } else {
+        start = clock();
         FactorizationValues sqrt_results = sqrt_reduction(n);
+        end = clock();
+        time_used_sqr = (double)(end - start) / CLOCKS_PER_SEC;
 
+        printf("Tiempo usado por reducción a cuadrado: %f segundos\n", time_used_sqr);
         printf("p: %lld\n", sqrt_results.p);
         printf("q: %lld\n", sqrt_results.q);
-        printf("n = p * q = %lld\n", sqrt_results.p * sqrt_results.q);
+
+        if (even_counter != 0) {
+            even_factor = (long long) pow(2, even_counter);
+            printf("r: %lld\n", even_factor);
+            printf("n = p * q * r = %lld\n", fermat_results.p * fermat_results.q * even_factor);
+        } else {
+            printf("n = p * q = %lld\n", fermat_results.p * fermat_results.q);
+        }
     }
 
     return 0;
@@ -73,7 +92,6 @@ FactorizationValues fermat_factorization(long long n) {
 
     while (coincidence == -1) {
         diff = (x * x) - n;
-        printf("%lld\n", x*x);
         if (isPerfectSquare(diff)) {
             coincidence = 1;
         } else {
