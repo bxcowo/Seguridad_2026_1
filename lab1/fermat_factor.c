@@ -47,8 +47,13 @@ int main(void) {
     printf("=========================================================================\n");
 
     if (n < 4){
+        if (even_counter != 0) {
+            printf("El algoritmo de reducción a cuadrado fallo, ya que se descompuso por completo con divisibilidad en 2\n");
+            printf("n = %lld * %lld\n", n, even_factor);
+            return 0;
+        }
         printf("El algoritmo de reducción a cuadrado fallo.\n");
-        printf("El número debe de ser mayor o igual que 4 para usar la factorización de reducción a cuadrado");
+        printf("El número debe de ser mayor o igual que 4 para usar la factorización de reducción a cuadrado\n");
     } else {
         start = clock();
         FactorizationValues sqrt_results = sqrt_reduction(n);
@@ -105,8 +110,14 @@ FactorizationValues fermat_factorization(long long n) {
 }
 
 FactorizationValues sqrt_reduction(long long n) {
-    long long i, curr_value, curr_mod, y, a, p;
-    y = 2 + ((long long) rand() * (long long) rand()) % (n - 3);
+    long long i = 0, curr_value, curr_mod, y, a, p;
+    while (i == 0) {
+        y = 2 + (((long long)rand() * (RAND_MAX + 1LL) + rand()) % (n - 3));
+        if (gcd(y, n) == 1){
+            break;
+        }
+    }
+
     a = (y * y) % n;
     p = 1;
 
@@ -114,7 +125,7 @@ FactorizationValues sqrt_reduction(long long n) {
         curr_mod = (i * i) % n ;
         if (curr_mod == a) {
             curr_value = i;
-            if ((curr_value % n != y) && (((-curr_value % n) + n) % n != y)) {
+            if (curr_value != y && curr_value != (n - y)) {
                 p = gcd(llabs(curr_value - y), n);
                 if (p != 1 && p != n) break;
             }
